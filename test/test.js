@@ -3,6 +3,8 @@ var expect = require('chai').expect;
 
 const WonderQ = require('../src/WonderQ');
 const Message = require('../src/Message');
+const Producer = require('../src/Producer');
+const Consumer = require('../src/Consumer');
 
 describe('WonderQ', function() {
   it('Create a queue', function() {
@@ -15,7 +17,7 @@ describe('WonderQ', function() {
     const message = {'timestamp': new Date(), 'body': 'this is the body'};
 
     const msg = queue.writeMessage(message);
-    expect(msg).to.be.a('number');
+    expect(msg).to.be.a('string');
   });
 
   it('Should be able to add and remove a single message to queue', function() {
@@ -45,4 +47,80 @@ describe('Message', function() {
     const message = new Message();
     expect(message).to.be.an('error');
   });
+});
+
+describe('Producer', function() {
+  it('Create a Producer', function() {
+    const queue = new WonderQ('Queue');
+    const producer = new Producer(queue);
+    assert.equal((producer instanceof Producer), true);
+  });
+
+  it('Producer without queue should fail', function() {
+    const producer = new Producer();
+    expect(producer).to.be.an('error');
+  });
+
+  it('Send Message to WonderQ', function() {
+    const queue = new WonderQ('Queue');
+    const producer = new Producer(queue);
+    const message = new Message('this is a message');
+
+    // Send message to WonderQ
+    const confirm = producer.sendMessage(message);
+
+    expect(confirm).to.be.a('string');
+  });
+});
+
+describe('Consumer', function() {
+  it('Create a Consumer', function() {
+    const queue = new WonderQ('Queue');
+    const consumer = new Consumer(queue);
+    assert.equal((consumer instanceof Consumer), true);
+  });
+
+  it('Consumer without queue should fail', function() {
+    const consumer = new Consumer();
+    expect(consumer).to.be.an('error');
+  });
+
+  it('Poll messages', function() {
+    const queue = new WonderQ('Queue');
+    const consumer = new Consumer(queue);
+
+    const message1 = new Message('this is a message');
+    const message2 = new Message('this is another message');
+    const message3 = new Message('this is yet another message');
+
+    // Not using Producer's sendMessage here to isolate these tests to Consumer class
+    queue.writeMessage(message1);
+    queue.writeMessage(message2);
+    queue.writeMessage(message3);
+
+    const messages = consumer.getMessages();
+    expect(messages).to.have.lengthOf(3);
+
+    // check that message was given id
+    expect(messages[0].id).to.be.a('string');
+  });
+
+  it('Process received message', function() {
+    const queue = new WonderQ('Queue');
+    const consumer = new Consumer(queue);
+
+    const message1 = new Message('this is a message');
+    const message2 = new Message('this is another message');
+
+    queue.writeMessage(message1);
+    queue.writeMessage(message2);
+
+    const messages = consumer.getMessages();
+    const msg = messages[0];
+
+    consumer.processMessage();
+
+    // check that message was deleted
+    expect(queue.findMessage(msg)).to.be.false;
+  })
 });
