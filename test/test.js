@@ -30,3 +30,16 @@ describe('WonderQ', function() {
     assert.equal(pollMessage[0].body, 'this is the body');
   });
 });
+
+describe('Message', function() {
+  it('Create a message', function() {
+    const message = new Message('this is a message');
+    assert.equal((message instanceof Message), true);
+    assert.property(message, 'timestamp');
+  });
+
+  it('Message without body should fail', function() {
+    const message = new Message();
+    expect(message).to.be.an('error');
+  });
+});
