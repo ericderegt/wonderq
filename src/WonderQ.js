@@ -3,13 +3,11 @@ class WonderQ {
    * WonderQ is a broker that allows multiple producers to write to it, and multiple consumers to read from it.
    * @param {String} name - queue name
    */
-  constructor(name) {
+  constructor(name, timeout = 500) {
     this.name = name;
     this.store = []; // database abstraction
     this.processing = [];
-
-    // TODO - Look into replacing this. Right now polling every second to see if any messages have expired.
-    // setInterval(this.checkAvailableMessages(), 1000);
+    this.timeout = timeout; // milliseconds until timeout
   }
 
   /**
@@ -33,11 +31,15 @@ class WonderQ {
    * @returns {Array.<Message>} - returns up to numMessages or else all messages
    */
   pollQueue(numMessages) {
+    // Check if any old messages and add back to store if so
+    this.checkAvailableMessages();
+
     if (!numMessages || numMessages >= this.store.length) {
       const messages = this.store;
       this.store = [];
 
       for (let msg of messages) {
+        msg.ttl = new Date(Date.now() + this.timeout);
         this.processing.push(msg);
       }
 
@@ -46,6 +48,7 @@ class WonderQ {
       const messages = this.store.splice(0, numMessages);
 
       for (let msg of messages) {
+        msg.ttl = new Date(Date.now() + this.timeout);
         this.processing.push(msg);
       }
 
@@ -79,6 +82,24 @@ class WonderQ {
     let indexStore = this.store.findIndex(msg => msg.id === messageID);
 
     return (indexProcessing != -1) || (indexStore != -1);
+  }
+
+  /**
+   * checkAvailableMessages checks whether there are messages that haven't been processed in time.
+   * These messages are then removed from the processing queue and added to the store where they may be consumed again.
+   * No inputs or return values. This function is called every second and mutates state.
+   */
+  checkAvailableMessages() {
+    let curDate = new Date();
+
+    for (let i = 0; i < this.processing.length; i++) {
+      let ttl = this.processing[i].ttl;
+      if (curDate > ttl) {
+        let message = this.processing.splice(i, 1);
+        i--; // we are removing an element from the array and so don't want to increment
+        this.store.push(message);
+      }
+    }
   }
 
   /**
