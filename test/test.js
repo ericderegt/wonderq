@@ -84,4 +84,23 @@ describe('Consumer', function() {
     const consumer = new Consumer();
     expect(consumer).to.be.an('error');
   });
+
+  it('Poll messages', function() {
+    const queue = new WonderQ('Queue');
+    const producer = new Producer(queue);
+    const consumer = new Consumer(queue);
+    const message1 = new Message('this is a message');
+    const message2 = new Message('this is another message');
+    const message3 = new Message('this is yet another message');
+
+    producer.sendMessage(message1);
+    producer.sendMessage(message2);
+    producer.sendMessage(message3);
+
+    const messages = consumer.getMessages();
+    expect(messages).to.have.lengthOf(3);
+
+    // check that message was given id
+    expect(messages[0].id).to.be.a('string');
+  });
 });

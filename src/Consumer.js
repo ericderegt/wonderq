@@ -9,6 +9,17 @@ class Consumer {
     } else {
       this.queue = queue;
     }
+
+    this.messages = [];
+  }
+
+  /**
+   * @returns {Array.<Message>} - all messages that are not currently being processed by other Consumers
+   */
+  getMessages() {
+    const messages = this.queue.pollQueue();
+    this.messages = messages;
+    return messages;
   }
 }
 
