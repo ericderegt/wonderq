@@ -116,7 +116,6 @@ describe('Consumer', function() {
     queue.writeMessage(message2);
 
     const messages = consumer.getMessages();
-
     const msg = messages[0];
 
     consumer.processMessage();
