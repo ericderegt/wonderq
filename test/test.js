@@ -3,6 +3,8 @@ var expect = require('chai').expect;
 
 const WonderQ = require('../src/WonderQ');
 const Message = require('../src/Message');
+const Producer = require('../src/Producer');
+const Consumer = require('../src/Consumer');
 
 describe('WonderQ', function() {
   it('Create a queue', function() {
@@ -44,5 +46,21 @@ describe('Message', function() {
   it('Message without body should fail', function() {
     const message = new Message();
     expect(message).to.be.an('error');
+  });
+});
+
+describe('Producer', function() {
+  it('Create a Producer', function() {
+    const queue = new WonderQ('Queue');
+    const producer = new Producer(queue);
+    assert.equal((producer instanceof Producer), true);
+  });
+});
+
+describe('Consumer', function() {
+  it('Create a Consumer', function() {
+    const queue = new WonderQ('Queue');
+    const consumer = new Consumer(queue);
+    assert.equal((consumer instanceof Consumer), true);
   });
 });
