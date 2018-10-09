@@ -55,6 +55,11 @@ describe('Producer', function() {
     const producer = new Producer(queue);
     assert.equal((producer instanceof Producer), true);
   });
+
+  it('Producer without queue should fail', function() {
+    const producer = new Producer();
+    expect(producer).to.be.an('error');
+  });
 });
 
 describe('Consumer', function() {
@@ -62,5 +67,10 @@ describe('Consumer', function() {
     const queue = new WonderQ('Queue');
     const consumer = new Consumer(queue);
     assert.equal((consumer instanceof Consumer), true);
+  });
+
+  it('Consumer without queue should fail', function() {
+    const consumer = new Consumer();
+    expect(consumer).to.be.an('error');
   });
 });
