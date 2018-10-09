@@ -1,0 +1,29 @@
+{
+  "name": "wonderq",
+  "version": "1.0.0",
+  "description": "WonderQ is a simple queuing system",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ericderegt/wonderq.git"
+  },
+  "keywords": [
+    "queue",
+    "message",
+    "queue",
+    "message",
+    "broker"
+  ],
+  "author": "Eric deRegt",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ericderegt/wonderq/issues"
+  },
+  "homepage": "https://github.com/ericderegt/wonderq#readme"
+}
