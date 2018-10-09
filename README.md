@@ -5,20 +5,23 @@ WonderQ is a broker that allows multiple producers to write to it, and multiple 
 # Instructions
 1. `npm install`
 2. `npm test` to run tests
+3. The module contains 5 classes that represent the WonderQ. They are detailed below
 
 # Classes
-- **WonderQ** - contains all messages that are in the store or currently being processed.
--- Create WonderQ - `new Queue(queueName)`
-- **Producer** - can send messages to the queue.
--- Create Producer - `new Producer(queue)`
--- Send message to WonderQ - `producer.sendMessage(message)`
-- **Consumer** - can receive messages from the queue. Consumer can also process messages and send acknowledgement to the queue.
--- Create Consumer - `new Consumer(queue)`
--- Poll messages from WonderQ - `consumer.getMessages()`
--- Process message - `consumer.processMessage()`
-- **Message** - class to represent a message.
--- Create Message - `new Message(messageBody)`
-- **Profiler** - developer tool to view key statistics of a queue.
+* **WonderQ** - contains all messages that are in the store or currently being processed.
+  * Create WonderQ - `new Queue(queueName)`
+* **Producer** - can send messages to the queue.
+  * Create Producer - `new Producer(queue)`
+  * Send message to WonderQ - `producer.sendMessage(message)`
+* **Consumer** - can receive messages from the queue. Consumer can also process messages and send acknowledgement to the queue.
+  * Create Consumer - `new Consumer(queue)`
+  * Poll messages from WonderQ - `consumer.getMessages()`
+  * Process message - `consumer.processMessage()`
+* **Message** - class to represent a message.
+  * Create Message - `new Message(messageBody)`
+* **Profiler** - developer tool to view key statistics of a queue.
+  * Create Profiler - `new Profiler(queue)`
+  * Get summary statistics - `profiler.getStats()`
 
 # Scaling
 - Discuss how would you go about scaling this system to meet high-volume requests? What infrastructure / stack would you use and why?
