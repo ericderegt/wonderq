@@ -10,6 +10,25 @@ class Producer {
       this.queue = queue;
     }
   }
+
+  /**
+   * sendMessage sends a message to the queue and receives an ID confirmation
+   * @param {Message} message - message to be sent
+   * @return {Number} messageID - ID returned as confirmation from queue
+   */
+  sendMessage(message) {
+    if (!message) {
+      return new Error("Message must not be empty.");
+    }
+
+    const messageID = this.queue.writeMessage(message);
+
+    if (!messageID instanceof Number) {
+      return new Error("Message unsuccessful.");
+    } else {
+      return messageID;
+    }
+  }
 }
 
 module.exports = Producer;

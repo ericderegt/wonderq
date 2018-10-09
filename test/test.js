@@ -17,7 +17,7 @@ describe('WonderQ', function() {
     const message = {'timestamp': new Date(), 'body': 'this is the body'};
 
     const msg = queue.writeMessage(message);
-    expect(msg).to.be.a('number');
+    expect(msg).to.be.a('string');
   });
 
   it('Should be able to add and remove a single message to queue', function() {
@@ -59,6 +59,17 @@ describe('Producer', function() {
   it('Producer without queue should fail', function() {
     const producer = new Producer();
     expect(producer).to.be.an('error');
+  });
+
+  it('Send Message to WonderQ', function() {
+    const queue = new WonderQ('Queue');
+    const producer = new Producer(queue);
+    const message = new Message('this is a message');
+
+    // Send message to WonderQ
+    const confirm = producer.sendMessage(message);
+
+    expect(confirm).to.be.a('string');
   });
 });
 
