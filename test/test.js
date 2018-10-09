@@ -25,7 +25,7 @@ describe('WonderQ', function() {
 
     queue.writeMessage(message);
 
-    const pollMessage = queue.pollMessage(1);
+    const pollMessage = queue.pollQueue(1);
     assert.lengthOf(pollMessage, 1);
     assert.equal(pollMessage[0].body, 'this is the body');
   });
