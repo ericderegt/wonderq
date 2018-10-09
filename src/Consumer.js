@@ -18,8 +18,23 @@ class Consumer {
    */
   getMessages() {
     const messages = this.queue.pollQueue();
-    this.messages = messages;
-    return messages;
+
+    for (let msg of messages) {
+        this.messages.push(msg);
+    }
+
+    return this.messages;
+  }
+
+  /**
+   * processMessage takes the first message on the Consumer's queue, processes it, and sends an acknowledgement to WonderQ
+   */
+  processMessage() {
+    let message = this.messages.splice(0,1)[0];
+
+    // TODO - Do further processing here
+
+    this.queue.deleteMessage(message);
   }
 }
 

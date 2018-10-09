@@ -6,8 +6,11 @@ class WonderQ {
   constructor(name) {
     this.name = name;
     this.store = []; // database abstraction
-  }
+    this.processing = [];
 
+    // TODO - Look into replacing this. Right now polling every second to see if any messages have expired.
+    // setInterval(this.checkAvailableMessages(), 1000);
+  }
 
   /**
    * writeMessage adds a message to the queue and returns an id as confirmation
@@ -33,12 +36,50 @@ class WonderQ {
     if (!numMessages || numMessages >= this.store.length) {
       const messages = this.store;
       this.store = [];
+
+      for (let msg of messages) {
+        this.processing.push(msg);
+      }
+
       return messages;
     } else {
       const messages = this.store.splice(0, numMessages);
+
+      for (let msg of messages) {
+        this.processing.push(msg);
+      }
+
       return messages;
     }
   }
+
+  /**
+   * deleteMessage receives a message from a Consumer that has processed it.
+   * This message is then deleted from the data store.
+   * @param {Message} message - message to be deleted
+   */
+   deleteMessage(message) {
+     let messageID = message.id;
+     let index = this.processing.findIndex(msg => msg.id === messageID);
+
+     if (index != -1) {
+       this.processing.splice(index, 1);
+     }
+   }
+
+  /**
+   * findMessage checks both the store and processing queue for a given message
+   * @param {Message} message - message to search for
+   * @returns {Boolean} found - true if found in either store or processing queue, false otherwise
+   */
+   findMessage(message) {
+     let messageID = message.id;
+
+     let indexProcessing = this.processing.findIndex(msg => msg.id === messageID);
+     let indexStore = this.store.findIndex(msg => msg.id === messageID);
+
+     return (indexProcessing != -1) || (indexStore != -1);
+   }
 
   /**
    * generateUUID generates a UUID to be used as a Message's ID.

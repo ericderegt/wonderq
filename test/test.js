@@ -87,15 +87,16 @@ describe('Consumer', function() {
 
   it('Poll messages', function() {
     const queue = new WonderQ('Queue');
-    const producer = new Producer(queue);
     const consumer = new Consumer(queue);
+
     const message1 = new Message('this is a message');
     const message2 = new Message('this is another message');
     const message3 = new Message('this is yet another message');
 
-    producer.sendMessage(message1);
-    producer.sendMessage(message2);
-    producer.sendMessage(message3);
+    // Not using Producer's sendMessage here to isolate these tests to Consumer class
+    queue.writeMessage(message1);
+    queue.writeMessage(message2);
+    queue.writeMessage(message3);
 
     const messages = consumer.getMessages();
     expect(messages).to.have.lengthOf(3);
@@ -103,4 +104,24 @@ describe('Consumer', function() {
     // check that message was given id
     expect(messages[0].id).to.be.a('string');
   });
+
+  it('Process received message', function() {
+    const queue = new WonderQ('Queue');
+    const consumer = new Consumer(queue);
+
+    const message1 = new Message('this is a message');
+    const message2 = new Message('this is another message');
+
+    queue.writeMessage(message1);
+    queue.writeMessage(message2);
+
+    const messages = consumer.getMessages();
+
+    const msg = messages[0];
+
+    consumer.processMessage();
+
+    // check that message was deleted
+    expect(queue.findMessage(msg)).to.be.false;
+  })
 });
