@@ -30,6 +30,34 @@ describe('WonderQ', function() {
     assert.lengthOf(pollMessage, 1);
     assert.equal(pollMessage[0].body, 'this is the body');
   });
+
+  it('Messages should be available again after timeout', function() {
+    const queue = new WonderQ('Queue');
+    const producer = new Producer(queue);
+    const consumer1 = new Consumer(queue);
+    const consumer2 = new Consumer(queue);
+
+    const message1 = new Message('this is a message');
+    const message2 = new Message('this is another message');
+    producer.sendMessage(message1);
+    producer.sendMessage(message2);
+
+    const messages = consumer1.getMessages();
+    expect(messages).to.have.lengthOf(2);
+
+    // used to simulate time having passed
+    for (let i = 0; i < queue.processing.length; i++) {
+      queue.processing[i].ttl = new Date(Date.now() - 20000); // default timeout is 500
+    }
+
+    const message3 = new Message('this is a third message');
+    producer.sendMessage(message3);
+
+    const repolledMessages = consumer2.getMessages();
+    console.log(repolledMessages);
+    expect(repolledMessages).to.have.lengthOf(3);
+
+  });
 });
 
 describe('Message', function() {
@@ -123,4 +151,25 @@ describe('Consumer', function() {
     // check that message was deleted
     expect(queue.findMessage(msg)).to.be.false;
   })
+
+  it('Poll and process should delete message', function() {
+    const queue = new WonderQ('Queue');
+    const consumer = new Consumer(queue);
+
+    const message1 = new Message('this is a message');
+    const message2 = new Message('this is another message');
+    queue.writeMessage(message1);
+    queue.writeMessage(message2);
+
+    const messages = consumer.getMessages();
+    const msg = messages[0];
+    consumer.processMessage();
+
+    const message3 = new Message('this is a third message');
+    queue.writeMessage(message3);
+
+    const repolledMessages = consumer.getMessages();
+    expect(repolledMessages).to.have.lengthOf(2);
+
+  });
 });

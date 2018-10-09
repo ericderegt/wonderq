@@ -7,6 +7,7 @@ class Message {
   constructor(body, timestamp = new Date()) {
     this.body = body;
     this.id = null;
+    this.ttl = null;
     this.timestamp = timestamp;
 
     if (!body) {
