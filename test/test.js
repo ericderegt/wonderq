@@ -5,6 +5,8 @@ const WonderQ = require('../src/WonderQ');
 const Message = require('../src/Message');
 const Producer = require('../src/Producer');
 const Consumer = require('../src/Consumer');
+const Profiler = require('../src/Profiler');
+
 
 describe('WonderQ', function() {
   it('Create a queue', function() {
@@ -171,5 +173,38 @@ describe('Consumer', function() {
     const repolledMessages = consumer.getMessages();
     expect(repolledMessages).to.have.lengthOf(2);
 
+  });
+});
+
+describe('Profiler', function() {
+  it('Create a Profiler', function() {
+    const queue = new WonderQ('Queue');
+    const profiler = new Profiler(queue);
+    assert.equal((profiler instanceof Profiler), true);
+  });
+
+  it('Profiler without queue should fail', function() {
+    const profiler = new Profiler();
+    expect(profiler).to.be.an('error');
+  });
+
+  it('Profiler should return correct types', function() {
+    const queue = new WonderQ('Queue');
+    const profiler = new Profiler(queue);
+
+    const message1 = new Message('this is a message');
+    const message2 = new Message('this is another message');
+    queue.writeMessage(message1);
+    queue.writeMessage(message2);
+
+    queue.pollQueue();
+
+    const message3 = new Message('this is a third message');
+    queue.writeMessage(message3);
+
+    const stats = profiler.getStats();
+    expect(stats[0]).to.be.a('string');
+    expect(stats[1]).to.be.a('number');
+    expect(stats[2]).to.be.a('number');
   });
 });
