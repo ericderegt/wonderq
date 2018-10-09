@@ -2,13 +2,12 @@ var assert = require('chai').assert;
 var expect = require('chai').expect;
 
 const WonderQ = require('../src/WonderQ');
+const Message = require('../src/Message');
 
 describe('WonderQ', function() {
   it('Create a queue', function() {
     const queue = new WonderQ('Queue');
-    // assert.equal([1,2,3].indexOf(2), 1);
     assert.equal((queue instanceof WonderQ), true);
-    // (queue instanceof WonderQ).should.be.true;
   });
 
   it('Write message should return ID', function() {
@@ -19,7 +18,7 @@ describe('WonderQ', function() {
     expect(msg).to.be.a('number');
   });
 
-  it('Should add and remove message to queue', function() {
+  it('Should be able to add and remove a single message to queue', function() {
     const queue = new WonderQ('Queue');
     const message = {'timestamp': new Date(), 'body': 'this is the body'};
 
@@ -28,5 +27,22 @@ describe('WonderQ', function() {
     const pollMessage = queue.pollQueue(1);
     assert.lengthOf(pollMessage, 1);
     assert.equal(pollMessage[0].body, 'this is the body');
+  });
+});
+
+describe('Message', function() {
+  it('Create a message', function() {
+    const message = new Message('this is a message');
+    assert.equal((message instanceof Message), true);
+    assert.property(message, 'timestamp');
+    assert.equal(message.body, 'this is a message');
+    assert.property(message, 'timestamp');
+    assert.property(message, 'id');
+    expect(message.timestamp).to.be.a('Date');
+  });
+
+  it('Message without body should fail', function() {
+    const message = new Message();
+    expect(message).to.be.an('error');
   });
 });
